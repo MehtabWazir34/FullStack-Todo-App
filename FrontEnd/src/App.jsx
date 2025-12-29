@@ -7,14 +7,14 @@ function App() {
   const [editMode, setMode] = useState(null)
 
   const upEditTask = (task)=> {
-      setInputText(task.text)
+      setInputText(task.taskText)
       setMode(task._id)
     }
   
   const fetchTodos = () => {
     axios.get('/all')
       .then((res) => {
-        setIt(res.data.todoID)
+        setIt(res.data.myTasks || [])
       }).catch((err) => console.log(err))
     }
 
@@ -27,32 +27,32 @@ function App() {
       if(editMode !==null){
         hadnleUpdate();
       } else {
-        handleAddTodo();
+        handleAddTodo(a);
       }
     }
 
     const handleAddTodo = async () => {
     // e.preventDefault() 
-    if (!inputText) return 
+        if (!inputText) return 
 
-    try {
-      const res = await axios.post('http://localhost:3400/create', {
-        text: inputText
-      })
-      setIt([...data, res.data.newTodo])
-      setInputText('')
-    } catch (error) {
-      console.log("Error adding todo:", error)
-    }
+        try {
+          const res = await axios.post('http://localhost:3300/createtask', {
+            taskText: inputText
+          })
+          setIt([...data, res.data.newTask])
+          setInputText('')
+        } catch (error) {
+          console.log("Error adding todo:", error)
+        }
   }
 
   const hadnleUpdate = async()=>{
     if(!inputText || !editMode) return
     try {
-      await axios.put(`http://localhost:3400/update/${editMode}`,{
-        text: inputText
+      await axios.put(`http://localhost:3300/update/${editMode}`,{
+        taskText: inputText
       })
-      setIt(Prev => Prev.map((item)=> item._id === editMode ? {...item, text:inputText} : item))
+      setIt(Prev => Prev.map((item)=> item._id === editMode ? {...item, taskText:inputText} : item))
       setMode(null)
       setInputText('')
     } catch (error) {
@@ -64,7 +64,7 @@ function App() {
 console.log(data);
  
 async function delTask(id) {
-      await axios.delete(`http://localhost:3400/delete/${id}`,)
+      await axios.delete(`http://localhost:3300/delete/${id}`,)
       const newData = data.filter((dId)=> dId._id != id)
       setIt(newData)
     }
@@ -74,16 +74,16 @@ async function upTask(id, currState) {
       try {
         const upDated = data.map((item)=>{
           if(item._id === id){
-            return {...item, todoStatus: newState}
+            return {...item, taskStatus: newState}
           }
           return item
         })
         
         setIt(upDated)
-        await axios.put(`http://localhost:3400/update/${id}`,{
-          todoStatus: newState
+        await axios.put(`http://localhost:3300/update/${id}`,{
+          taskStatus: newState
         })
-        // await axios.put('http://localhost:3400/update')
+        // await axios.put('http://localhost:3300/update')
       } catch (error) {
         console.log(("Updation err: ", error));
         
@@ -132,14 +132,14 @@ async function upTask(id, currState) {
               >
                 <div className='w-full grid grid-cols-1'>
                   <div className='flex justify-around'>
-                    <h2 onClick={()=> upTask(it._id, it.todoStatus)}
-                    className={`text-lg w-full ${it.todoStatus ? 'line-through text-gray-300': 'text-gray-50'}`} >{it.text}</h2>
-                    <span className={`text-sm ${it.todoStatus ? 'text-green-400 ' : 'text-yellow-400'}`}>{it.todoStatus ? 'Done' : 'Pending'}</span>
+                    <h2 onClick={()=> upTask(it._id, it.taskStatus)}
+                    className={`text-lg w-full ${it.taskStatus ? 'line-through text-gray-300': 'text-gray-50'}`} >{it.taskText}</h2>
+                    <span className={`text-sm ${it.taskStatus ? 'text-green-400 ' : 'text-yellow-400'}`}>{it.taskStatus ? 'Done' : 'Pending'}</span>
                   </div>
 
                   <div className='flex justify-end gap-4'>
                     <span className='cursor-pointer bg-red-400 transition-colors duration-200 rounded-md px-1 text-[12px] hover:bg-red-600' onClick={()=>delTask(it._id)}>Del</span>
-                    <span className={`${it.todoStatus ? 'hidden': 'block'} cursor-pointer bg-blue-400 transition-colors duration-200 rounded-md px-1 text-[12px] text-center hover:bg-blue-600`} onClick={()=>hadnleUpdate(it)}>Edit</span>
+                    <span className={`${it.taskStatus ? 'hidden': 'block'} cursor-pointer bg-blue-400 transition-colors duration-200 rounded-md px-1 text-[12px] text-center hover:bg-blue-600`} onClick={()=>upEditTask(it)}>Edit</span>
                   </div>
                 </div>
 

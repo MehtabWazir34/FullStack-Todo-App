@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   server:{
     proxy:{
-      '/all': {target: 'http://localhost:3400', changeOrigin: true,}
+      '/all': {target: 'http://localhost:3300', changeOrigin: true,}
     },
     
   },

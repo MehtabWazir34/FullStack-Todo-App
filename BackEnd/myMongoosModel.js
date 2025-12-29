@@ -1,10 +1,9 @@
-const myMongoos = require('mongoose')
-const mySchema = new myMongoos.Schema({
-    text: String,
-    todoStatus: Boolean,
-})
+// import mongoose from "mongoose";
+const mongoose = require('mongoose')
+const myModelSchema = new mongoose.Schema({
+    taskText: String,
+    taskStatus: Boolean
+});
 
-const myModel = myMongoos.model('mySchemaModel', mySchema)
-module.exports = {
-    myModel
-}
+let myModel = mongoose.model('MyModel', myModelSchema);
+module.exports = { myModel };
